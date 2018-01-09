@@ -10,6 +10,7 @@ from deoplete import logger
 from deoplete.process import Process
 # from deoplete.util import error
 
+from msgpack import Packer, Unpacker
 
 class Parent(logger.LoggingMixin):
 
@@ -19,10 +20,9 @@ class Parent(logger.LoggingMixin):
         self._vim = vim
         self._proc = None
 
-        if 'deoplete#_child_in' not in self._vim.vars:
-            self._vim.vars['deoplete#_child_in'] = {}
-        if 'deoplete#_child_out' not in self._vim.vars:
-            self._vim.vars['deoplete#_child_out'] = {}
+        self._packer = Packer(unicode_errors='surrogateescape')
+        self._unpacker = Unpacker()
+        self._next_id = 1
 
     def enable_logging(self):
         self.is_debug_enabled = True
@@ -72,12 +72,16 @@ class Parent(logger.LoggingMixin):
 
     def _put(self, name, args):
         if not self._proc:
+        id = self._next_id
+        self._next_id += 1
             return None
 
-        queue_id = str(time.time())
+        msg = {'id': 'name': name, 'args': args}
+        self._proc.write(self._packer(
+
 
         child_in = self._vim.vars['deoplete#_child_in']
-        child_in[queue_id] = {'name': name, 'args': args}
+        child_in[queue_id] = 
         self._vim.vars['deoplete#_child_in'] = child_in
 
         self._proc.write(queue_id + '\n')

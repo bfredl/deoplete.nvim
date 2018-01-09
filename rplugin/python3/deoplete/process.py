@@ -16,7 +16,7 @@ class Process(object):
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         self.__proc = subprocess.Popen(commands,
                                        stdin=subprocess.PIPE,
-                                       stdout=subprocess.DEVNULL,
+                                       stdout=subprocess.PIPE,
                                        stderr=subprocess.DEVNULL,
                                        startupinfo=startupinfo,
                                        cwd=cwd)
@@ -34,6 +34,8 @@ class Process(object):
         self.__proc = None
 
     def write(self, text):
-        self.__proc.stdin.write(text.encode(
-            self.__context['encoding'], errors='replace'))
+        self.__proc.stdin.write(text)
         self.__proc.stdin.flush()
+
+    def poll_out(self):
+        pass
